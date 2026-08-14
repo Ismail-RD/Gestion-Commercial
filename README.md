@@ -142,6 +142,30 @@ le code, ni dans la configuration.
 **Ne jamais activer `app.donnees-demo` en production** : il crée des comptes
 dont les mots de passe figurent dans ce dépôt.
 
+### Héberger le serveur
+
+L'application écoute le port imposé par l'hébergeur (`PORT`), et se contente
+de variables d'environnement — rien à modifier dans le code pour déployer.
+
+Sur Railway, avec une base PostgreSQL dans le même projet :
+
+| Variable | Valeur |
+|---|---|
+| `DB_URL` | `jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}` |
+| `DB_USERNAME` | `${{Postgres.PGUSER}}` |
+| `DB_PASSWORD` | `${{Postgres.PGPASSWORD}}` |
+| `JWT_SECRET` | une clé propre à cet environnement |
+| `CORS_ORIGINS` | l'adresse du frontend déployé |
+| `FRONTEND_URL` | la même, pour les liens envoyés aux clients |
+| `UPLOAD_DIR` | un chemin dans un volume persistant |
+
+Deux pièges. L'URL fournie par l'hébergeur (`DATABASE_URL`) n'est **pas** une
+URL JDBC : il faut la recomposer comme ci-dessus. Et le disque d'un conteneur
+est effacé à chaque redéploiement — sans volume monté, les fiches techniques et
+les bons de commande déposés par les clients disparaîtraient.
+
+Flyway applique les migrations au démarrage : la base n'a rien à préparer.
+
 ## Organisation du dépôt
 
 ```
