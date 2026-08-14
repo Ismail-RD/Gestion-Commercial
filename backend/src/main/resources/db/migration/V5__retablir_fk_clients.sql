@@ -3,6 +3,13 @@
 -- Cause : la V2 a supprime ces FK puis fait un "drop table clients cascade" ;
 -- la version reellement appliquee ne les a pas recreees. Resultat : on pouvait
 -- supprimer un client et laisser ses devis/commandes/factures orphelins.
+--
+-- Pourquoi ce script est idempotent : la V2 du depot, elle, recree bien ces
+-- contraintes. Sur une base neuve, la chaine complete les pose donc avant
+-- d'arriver ici, et un simple "add constraint" echouerait -- ce qui rendait
+-- toute installation from scratch impossible, alors que la mise a jour d'une
+-- base existante fonctionnait. On supprime donc avant de reposer : le resultat
+-- est le meme dans les deux cas.
 
 -- 1. Nettoyage des orphelins (aucune FK ne peut etre posee tant qu'il en reste).
 --    Ordre de suppression : enfants avant parents.
@@ -39,14 +46,17 @@ where d.client_id is not null
 
 -- 2. Retablissement des contraintes
 
+alter table devis drop constraint if exists devis_client_id_fkey;
 alter table devis
     add constraint devis_client_id_fkey
     foreign key (client_id) references clients;
 
+alter table commandes drop constraint if exists commandes_client_id_fkey;
 alter table commandes
     add constraint commandes_client_id_fkey
     foreign key (client_id) references clients;
 
+alter table factures drop constraint if exists factures_client_id_fkey;
 alter table factures
     add constraint factures_client_id_fkey
     foreign key (client_id) references clients;

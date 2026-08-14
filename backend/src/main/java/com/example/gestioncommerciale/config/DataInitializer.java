@@ -121,9 +121,14 @@ public class DataInitializer implements CommandLineRunner {
                     """);
             return;
         }
+        // Le prenom ne peut pas rester vide : l'entite l'exige. Plutot que
+        // d'ajouter une cle de configuration que personne ne remplirait, on le
+        // tire de l'adresse — "direction@sogetherm.ma" donne "direction", ce
+        // qui se corrige en deux clics depuis l'ecran Utilisateurs.
+        String avantArobase = adminEmail.split("@")[0];
         utilisateurRepository.save(Utilisateur.builder()
                 .nom("Administrateur")
-                .prenom("")
+                .prenom(avantArobase.isBlank() ? "Compte" : avantArobase)
                 .email(adminEmail)
                 .motDePasse(passwordEncoder.encode(adminMotDePasse))
                 .role(Role.ADMIN)
