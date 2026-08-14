@@ -1,0 +1,49 @@
+# --- Secrets et configuration locale ---
+# Le fichier reel porte les identifiants SMTP ; seul le modele est versionne.
+application-local.properties
+*.env
+.env
+.env.*
+!.env.exemple
+
+# --- Donnees clients ---
+# Fiches techniques et bons de commande deposes par les clients : ce sont des
+# documents reels, ils n'ont rien a faire dans un depot.
+backend/uploads/
+
+# --- Compilation ---
+target/
+build/
+dist/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+
+# --- Dependances ---
+node_modules/
+.pnp
+.pnp.js
+
+# --- Journaux et fichiers temporaires ---
+*.log
+npm-debug.log*
+yarn-error.log*
+logs/
+*.tmp
+
+# --- Outils et environnements de developpement ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+Gc/
+
+# --- Systeme ---
+.DS_Store
+Thumbs.db
+desktop.ini

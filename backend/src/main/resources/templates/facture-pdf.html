@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page { size: A4; margin: 1.1cm 1.3cm; }
+        * { box-sizing: border-box; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 10px; color: #222; }
+        table { border-collapse: collapse; width: 100%; }
+        .no-border td, .no-border th { border: none; }
+
+        /* En-tete */
+        .entete td { vertical-align: top; border: none; }
+        .logo-societe { width: 40%; }
+        .logo-societe img { height: 46px; }
+        .coord { width: 60%; font-size: 9px; text-align: left; padding-top: 4px; }
+
+        /* Titre + client */
+        .titre { font-size: 20px; font-weight: bold; color: #333; }
+        .client-box { border: 1px solid #333; padding: 6px 8px; font-size: 9.5px; }
+        .client-box .nom { font-weight: bold; text-transform: uppercase; }
+        .client-box div { margin-bottom: 1px; }
+
+        /* Table meta */
+        .meta { margin-top: 10px; }
+        .meta th, .meta td { border: 1px solid #333; padding: 4px 6px; font-size: 9.5px; }
+        .meta th { background: #f2f2f2; text-align: left; font-weight: bold; }
+        .page { text-align: right; font-size: 9px; margin: 2px 0 8px; }
+
+        /* Lignes */
+        .lignes th, .lignes td { border: 1px solid #333; padding: 5px 6px; font-size: 9.5px; }
+        .lignes th { background: #f2f2f2; text-align: left; }
+        .lignes .num { text-align: right; }
+        .lignes .center { text-align: center; }
+
+        /* Reglement + totaux */
+        .bloc { margin-top: 12px; }
+        .bloc td { vertical-align: top; border: none; }
+        .reglement { width: 55%; font-size: 9px; }
+        .reglement th, .reglement td { border: 1px solid #333; padding: 4px 6px; }
+        .reglement th { background: #f2f2f2; text-align: left; width: 45%; }
+        .reglement .num { text-align: right; }
+        .reglement .du { font-weight: bold; }
+        .totaux-cell { width: 45%; }
+        .totaux th, .totaux td { border: 1px solid #333; padding: 4px 6px; font-size: 9px; text-align: right; }
+        .totaux th { background: #f2f2f2; text-align: center; }
+        .net th { background: #e8e8e8; }
+        .ttc-row td { text-align: left; font-weight: bold; }
+
+
+        /* Pied */
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; }
+        .iso { text-align: center; }
+        .iso img { height: 52px; margin: 0 6px; }
+        .legal { text-align: center; font-size: 8px; color: #333; border-top: 1px solid #999;
+                 padding-top: 3px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+<!-- ==== EN-TETE ==== -->
+<table class="entete">
+    <tr>
+        <td class="logo-societe">
+            <img th:if="${logoSogetherm != ''}" th:src="${logoSogetherm}" alt="SOGETHERM"/>
+        </td>
+        <td class="coord">
+            <span th:text="${societe.adresse}">Adresse</span><br/>
+            Tél : <span th:text="${societe.tel}"></span><br/>
+            Fax : <span th:text="${societe.fax}"></span><br/>
+            Email : <span th:text="${societe.email}"></span><br/>
+            Site web : <span th:text="${societe.siteWeb}"></span>
+        </td>
+    </tr>
+</table>
+
+<!-- ==== TITRE + CLIENT ==== -->
+<table class="no-border" style="margin-top:8px;">
+    <tr>
+        <td style="width:58%; vertical-align:top;">
+            <div class="titre">FACTURE :</div>
+        </td>
+        <td style="width:42%; vertical-align:top;">
+            <div class="client-box">
+                <div class="nom" th:text="${clientNom}">CLIENT</div>
+                <div th:if="${clientAdresse}" th:text="${clientAdresse}">Adresse</div>
+                <div th:each="tel : ${clientTelephones}" th:text="${tel}">Tel</div>
+                <div th:if="${clientIce}">ICE : <span th:text="${clientIce}"></span></div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- ==== META ==== -->
+<table class="meta">
+    <tr>
+        <th style="width:18%;">NUMERO</th>
+        <th style="width:15%;">DATE</th>
+        <th style="width:15%;">ECHEANCE</th>
+        <th style="width:18%;">COMMANDE</th>
+        <th style="width:17%;">EMETTEUR</th>
+        <th style="width:17%;">Représentant</th>
+    </tr>
+    <tr>
+        <td th:text="${numero}"></td>
+        <td th:text="${date}"></td>
+        <td th:text="${echeance}"></td>
+        <td th:text="${commandeNumero}"></td>
+        <td th:text="${emetteur}"></td>
+        <td th:text="${representant}"></td>
+    </tr>
+</table>
+<div class="page">Page 1</div>
+
+<!-- ==== LIGNES ==== -->
+<table class="lignes">
+    <tr>
+        <th style="width:14%;">Réf.</th>
+        <th style="width:34%;">Désignation</th>
+        <th style="width:8%;" class="center">Unité</th>
+        <th style="width:11%;" class="num">Qté</th>
+        <th style="width:16%;" class="num">Prix unit. HT</th>
+        <th style="width:17%;" class="num">Montant HT</th>
+    </tr>
+    <tr th:each="l : ${lignes}">
+        <td th:text="${l.reference}">REF</td>
+        <td th:text="${l.designation}">Designation</td>
+        <td class="center" th:text="${l.unite}"></td>
+        <td class="num" th:text="${l.quantite}"></td>
+        <td class="num" th:text="${l.prixUnitaire}"></td>
+        <td class="num" th:text="${l.montant}"></td>
+    </tr>
+</table>
+
+<!-- ==== ETAT DU REGLEMENT + TOTAUX ==== -->
+<table class="bloc no-border">
+    <tr>
+        <td class="reglement">
+            <table>
+                <tr>
+                    <th>Statut</th>
+                    <td th:text="${statut}"></td>
+                </tr>
+                <tr>
+                    <th>Déjà réglé</th>
+                    <td class="num" th:text="${montantPaye}"></td>
+                </tr>
+                <tr>
+                    <th>Reste à payer</th>
+                    <td class="num du" th:text="${resteAPayer}"></td>
+                </tr>
+            </table>
+        </td>
+        <td class="totaux-cell">
+            <table class="totaux">
+                <tr>
+                    <th>Code</th>
+                    <th>TOTAL H.T</th>
+                    <th>T.V.A %</th>
+                    <th>TOTAL T.V.A</th>
+                    <th class="net">NET A PAYER</th>
+                </tr>
+                <tr>
+                    <td th:text="${codeTVA}"></td>
+                    <td th:text="${totalHT}"></td>
+                    <td th:text="${tauxTVA} + ' %'"></td>
+                    <td th:text="${totalTVA}"></td>
+                    <td th:text="${netAPayer}"></td>
+                </tr>
+                <tr class="ttc-row">
+                    <td colspan="3">TOTAL T.T.C</td>
+                    <td colspan="2" th:text="${netAPayer}"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+
+
+<!-- ==== PIED DE PAGE ==== -->
+<div class="footer">
+    <div class="iso">
+        <img th:if="${logoIso9001 != ''}" th:src="${logoIso9001}" alt="ISO 9001"/>
+        <img th:if="${logoIso14001 != ''}" th:src="${logoIso14001}" alt="ISO 14001"/>
+        <img th:if="${logoIso45001 != ''}" th:src="${logoIso45001}" alt="ISO 45001"/>
+    </div>
+    <div class="legal">
+        RC.Casa : <span th:text="${societe.rc}"></span> -
+        P : <span th:text="${societe.patente}"></span> -
+        Ident. Fiscal : <span th:text="${societe.identifiantFiscal}"></span> -
+        CNSS : <span th:text="${societe.cnss}"></span> -
+        ICE <span th:text="${societe.ice}"></span>
+    </div>
+</div>
+
+</body>
+</html>

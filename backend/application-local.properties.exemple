@@ -1,0 +1,23 @@
+# Modele du fichier de configuration local.
+#
+# A copier en "application-local.properties" (sans l'extension .exemple) et a
+# completer. Le fichier reel n'est jamais versionne : c'est lui qui porte les
+# identifiants.
+
+# --- Base de donnees ---
+# Peuvent aussi etre passees en variables d'environnement.
+# spring.datasource.username=postgres
+# spring.datasource.password=
+
+# --- SMTP ---
+# Laisser vide desactive l'envoi des devis et factures par email.
+# ATTENTION : une fois renseigne, l'application envoie de vrais messages aux
+# adresses reelles des clients.
+# spring.mail.username=
+# spring.mail.password=
+# app.mail.expediteur=
+
+# --- Signature des jetons ---
+# Chaine Base64 d'au moins 256 bits. Obligatoire en production : la valeur par
+# defaut est publique, quiconque la connait peut forger un jeton.
+# app.jwt.secret=

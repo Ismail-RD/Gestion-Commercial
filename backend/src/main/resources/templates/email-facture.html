@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<!-- Email HTML : mise en page en tableaux + styles en ligne (seul rendu fiable
+     dans les clients de messagerie). Le logo est joint en inline (cid). -->
+<body style="margin:0; padding:0; background-color:#f4f6f8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+       style="background-color:#f4f6f8; padding:24px 0;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="width:600px; max-width:100%; background-color:#ffffff;
+                          border:1px solid #e0e4e8; border-radius:6px; overflow:hidden;
+                          font-family:Arial, Helvetica, sans-serif; color:#243238;">
+
+                <!-- En-tete : logo societe -->
+                <tr>
+                    <td style="padding:24px 28px 12px 28px; border-bottom:3px solid #00a0df;">
+                        <img th:if="${logoCid != ''}" th:src="'cid:' + ${logoCid}"
+                             alt="SOGETHERM" height="46"
+                             style="display:block; height:46px; border:0;"/>
+                    </td>
+                </tr>
+
+                <!-- Corps -->
+                <tr>
+                    <td style="padding:24px 28px 8px 28px;">
+                        <p style="margin:0 0 14px 0; font-size:15px;">
+                            Bonjour <strong th:text="${clientNom}">Client</strong>,
+                        </p>
+                        <p style="margin:0 0 16px 0; font-size:14px; line-height:1.55;">
+                            Nous vous remercions de votre confiance. Vous trouverez votre facture
+                            en pièce jointe de cet email.
+                        </p>
+
+                        <!-- Recapitulatif -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                               style="border-collapse:collapse; margin:16px 0; font-size:14px;">
+                            <tr>
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8; width:45%;">
+                                    Numéro de facture
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;">
+                                    <strong th:text="${numero}">FAC-2026-0001</strong>
+                                </td>
+                            </tr>
+                            <tr th:if="${commandeNumero != null and commandeNumero != ''}">
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8;">
+                                    Commande
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;" th:text="${commandeNumero}">CMD</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8;">
+                                    Date
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;" th:text="${date}">01/01/2026</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8;">
+                                    Échéance
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;">
+                                    <strong th:text="${echeance}">31/12/2030</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8;">
+                                    Montant total (TTC)
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;">
+                                    <span th:text="${netAPayer}">0,00</span> DH
+                                </td>
+                            </tr>
+                            <!-- Ce qui reste du : l'information utile au client -->
+                            <tr>
+                                <td style="padding:8px 12px; background-color:#f4f6f8; border:1px solid #e0e4e8;">
+                                    Reste à payer
+                                </td>
+                                <td style="padding:8px 12px; border:1px solid #e0e4e8;">
+                                    <strong th:text="${resteAPayer}">0,00</strong> DH
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p th:if="${soldee}" style="margin:16px 0; font-size:14px; line-height:1.55;">
+                            Cette facture est <strong>intégralement réglée</strong>. Nous vous en remercions.
+                        </p>
+                        <p th:unless="${soldee}" style="margin:16px 0; font-size:14px; line-height:1.55;">
+                            Nous vous remercions de bien vouloir procéder au règlement avant
+                            le <strong th:text="${echeance}">31/12/2030</strong>.
+                        </p>
+
+                        <p style="margin:0 0 4px 0; font-size:14px;">Cordialement,</p>
+                        <p style="margin:0 0 20px 0; font-size:14px;">
+                            <strong th:text="${societe.nom}">SOGETHERM</strong> —
+                            <span th:text="${societe.tagline}">Thermique &amp; Batiment</span>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Pied : coordonnees societe -->
+                <tr>
+                    <td style="padding:16px 28px 22px 28px; background-color:#f4f6f8;
+                               border-top:1px solid #e0e4e8; font-size:12px; color:#61717a; line-height:1.6;">
+                        <span th:text="${societe.adresse}">Adresse</span><br/>
+                        Tél : <span th:text="${societe.tel}"></span> —
+                        Fax : <span th:text="${societe.fax}"></span><br/>
+                        <span th:text="${societe.email}"></span> —
+                        <span th:text="${societe.siteWeb}"></span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
