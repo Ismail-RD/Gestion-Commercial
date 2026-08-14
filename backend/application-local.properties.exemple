@@ -2,12 +2,31 @@
 #
 # A copier en "application-local.properties" (sans l'extension .exemple) et a
 # completer. Le fichier reel n'est jamais versionne : c'est lui qui porte les
-# identifiants.
+# identifiants. En production, on lui prefere des variables d'environnement.
+
+# --- Signature des jetons (obligatoire) ---
+# Chaine Base64 d'au moins 256 bits, propre a chaque environnement.
+# L'application refuse de demarrer sans. Pour en generer une :
+#   openssl rand -base64 48
+app.jwt.secret=
 
 # --- Base de donnees ---
-# Peuvent aussi etre passees en variables d'environnement.
+# Peuvent aussi venir des variables DB_USERNAME et DB_PASSWORD.
 # spring.datasource.username=postgres
 # spring.datasource.password=
+
+# --- Donnees de demonstration ---
+# Cree des comptes aux mots de passe connus, des clients et des produits
+# d'exemple. En developpement uniquement : ne jamais activer en production.
+# app.donnees-demo=true
+
+# --- Premier administrateur ---
+# Utile seulement au tout premier demarrage, sur une base vide et sans donnees
+# de demonstration. Le compte est cree une fois, puis ces lignes ne servent
+# plus a rien : retirez-les. Les autres comptes se creent ensuite depuis
+# l'ecran Utilisateurs, chacun choisissant son mot de passe par lien email.
+# app.bootstrap.admin-email=
+# app.bootstrap.admin-mot-de-passe=
 
 # --- SMTP ---
 # Laisser vide desactive l'envoi des devis et factures par email.
@@ -16,8 +35,3 @@
 # spring.mail.username=
 # spring.mail.password=
 # app.mail.expediteur=
-
-# --- Signature des jetons ---
-# Chaine Base64 d'au moins 256 bits. Obligatoire en production : la valeur par
-# defaut est publique, quiconque la connait peut forger un jeton.
-# app.jwt.secret=

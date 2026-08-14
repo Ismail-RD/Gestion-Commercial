@@ -71,12 +71,22 @@ cp backend/application-local.properties.exemple backend/application-local.proper
 La base se configure par variables d'environnement (`DB_USERNAME`,
 `DB_PASSWORD`), le reste dans le fichier local.
 
+**Le secret de signature des jetons est obligatoire.** Il n'a pas de valeur par
+défaut : une clé écrite dans le dépôt est une clé publique, et quiconque la lit
+peut forger un jeton d'administrateur. L'application refuse de démarrer sans,
+avec un message qui dit quoi faire. Pour en générer un :
+
+```bash
+openssl rand -base64 48
+```
+
+Pour travailler avec des données d'exemple — comptes de démonstration, clients
+et produits — ajoutez `app.donnees-demo=true` dans le fichier local. C'est faux
+par défaut, précisément pour qu'une mise en production n'ait rien à désactiver.
+
 > **Attention** : renseigner les identifiants SMTP active l'envoi de **vrais
 > emails aux adresses réelles des clients**. Laissez-les vides tant que vous
 > n'en avez pas besoin.
-
-En production, `JWT_SECRET` doit impérativement être surchargé : la valeur par
-défaut est publique.
 
 ### Lancer
 
@@ -97,6 +107,40 @@ cd backend && ./mvnw test
 ```
 
 La suite tourne sur une base H2 en mémoire, indépendante de PostgreSQL.
+
+## Mise en production
+
+Trois variables suffisent, et aucune n'a de valeur par défaut utilisable telle
+quelle :
+
+```bash
+DB_URL / DB_USERNAME / DB_PASSWORD   # la base
+JWT_SECRET                           # la clé de signature, propre à l'environnement
+CORS_ORIGINS                         # l'adresse réelle du frontend
+```
+
+Sans `CORS_ORIGINS`, le serveur refuse son propre site : la valeur par défaut
+ne connaît que `localhost`.
+
+**Le premier administrateur.** Sur une base vierge, aucun compte n'existe et
+personne ne peut se connecter — c'est voulu. Définissez, le temps du premier
+démarrage seulement :
+
+```bash
+APP_ADMIN_EMAIL=... APP_ADMIN_MOT_DE_PASSE=...
+```
+
+Le compte n'est créé que si la table des utilisateurs est **entièrement vide**,
+donc ce mécanisme ne peut pas faire réapparaître un accès sur une base en
+service. Retirez ensuite ces deux variables : elles ne servent plus à rien.
+
+Les autres comptes se créent depuis l'écran Utilisateurs. L'invité reçoit un
+lien par email et choisit lui-même son mot de passe, qui n'existe alors nulle
+part ailleurs que dans sa tête — aucun mot de passe n'est jamais écrit ni dans
+le code, ni dans la configuration.
+
+**Ne jamais activer `app.donnees-demo` en production** : il crée des comptes
+dont les mots de passe figurent dans ce dépôt.
 
 ## Organisation du dépôt
 

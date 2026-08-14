@@ -4,6 +4,7 @@ import com.example.gestioncommerciale.entity.*;
 import com.example.gestioncommerciale.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,17 @@ public class DataInitializer implements CommandLineRunner {
     private final ProduitRepository produitRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Jeu de donnees de demonstration : comptes connus, clients et produits
+     * d'exemple. Faux par defaut, precisement pour qu'une mise en production
+     * n'ait rien a desactiver.
+     */
+    private final boolean donneesDemo;
+
+    /** Administrateur du premier demarrage, quand la base est encore vide. */
+    private final String adminEmail;
+    private final String adminMotDePasse;
+
     public DataInitializer(UtilisateurRepository utilisateurRepository,
                            PouvoirRoleRepository pouvoirRoleRepository,
                            DepotRepository depotRepository,
@@ -37,7 +49,10 @@ public class DataInitializer implements CommandLineRunner {
                            FournisseurRepository fournisseurRepository,
                            ClientRepository clientRepository,
                            ProduitRepository produitRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           @Value("${app.donnees-demo:false}") boolean donneesDemo,
+                           @Value("${app.bootstrap.admin-email:}") String adminEmail,
+                           @Value("${app.bootstrap.admin-mot-de-passe:}") String adminMotDePasse) {
         this.utilisateurRepository = utilisateurRepository;
         this.pouvoirRoleRepository = pouvoirRoleRepository;
         this.depotRepository = depotRepository;
@@ -47,12 +62,22 @@ public class DataInitializer implements CommandLineRunner {
         this.clientRepository = clientRepository;
         this.produitRepository = produitRepository;
         this.passwordEncoder = passwordEncoder;
+        this.donneesDemo = donneesDemo;
+        this.adminEmail = adminEmail;
+        this.adminMotDePasse = adminMotDePasse;
     }
 
     @Override
     public void run(String... args) {
-        seedAdmin();
+        // Les pouvoirs par role sont structurels : sans eux, personne ne peut
+        // rien accorder. Ils sont poses quel que soit l'environnement.
         seedPouvoirs();
+        amorcerAdministrateur();
+
+        if (!donneesDemo) {
+            return;
+        }
+        seedComptesDemo();
         seedDepots();
         seedCategories();
         seedMarques();
@@ -62,11 +87,61 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Chaque compte est cree independamment : un garde global du type
-     * "count() == 0" empecherait tout nouveau compte d'apparaitre sur une base
-     * deja amorcee.
+     * Cree le tout premier administrateur, et lui seul.
+     *
+     * <p>Deux garde-fous. Le compte n'est cree que si la table des utilisateurs
+     * est <em>entierement vide</em> : sur une base deja en service, ce code ne
+     * peut donc pas faire apparaitre un acces. Et son mot de passe vient de la
+     * configuration, jamais du code — un mot de passe ecrit dans le depot est
+     * un mot de passe public.
+     *
+     * <p>Une fois cet administrateur en place, les autres comptes se creent
+     * depuis l'ecran Utilisateurs : l'invite recoit un lien par email et
+     * choisit lui-meme son mot de passe, qui n'existe alors nulle part ailleurs
+     * que dans sa tete.
      */
-    private void seedAdmin() {
+    private void amorcerAdministrateur() {
+        if (utilisateurRepository.count() > 0) {
+            return;
+        }
+        if (adminEmail.isBlank() || adminMotDePasse.isBlank()) {
+            log.warn("""
+
+                    ====================================================================
+                    Aucun utilisateur en base, et aucun administrateur a amorcer.
+                    Personne ne peut se connecter.
+
+                    Definissez, le temps du premier demarrage :
+                      APP_ADMIN_EMAIL=...
+                      APP_ADMIN_MOT_DE_PASSE=...
+
+                    Le compte sera cree une seule fois. Retirez ces variables
+                    ensuite : elles ne servent plus a rien.
+                    ====================================================================
+                    """);
+            return;
+        }
+        utilisateurRepository.save(Utilisateur.builder()
+                .nom("Administrateur")
+                .prenom("")
+                .email(adminEmail)
+                .motDePasse(passwordEncoder.encode(adminMotDePasse))
+                .role(Role.ADMIN)
+                .actif(true)
+                .build());
+        log.info("Administrateur initial cree : {}. Changez son mot de passe des la "
+                + "premiere connexion.", adminEmail);
+    }
+
+    /**
+     * Comptes de demonstration, un par role, avec des mots de passe connus.
+     *
+     * <p>Reserves au developpement et aux tests : ils ne sont crees que si
+     * {@code app.donnees-demo} vaut vrai, ce qui n'est jamais le cas par
+     * defaut. Chaque compte est verifie separement, pour qu'un role ajoute plus
+     * tard apparaisse sur une base deja amorcee.
+     */
+    private void seedComptesDemo() {
         creerUtilisateurSiAbsent("admin@gestioncommerciale.local", "Admin", "Systeme",
                 "Admin@123", Role.ADMIN);
         creerUtilisateurSiAbsent("m.benali@sogetherm.ma", "Benali", "Mohamed",
