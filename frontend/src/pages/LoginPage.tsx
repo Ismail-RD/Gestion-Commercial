@@ -17,7 +17,9 @@ import { BLEU_MARQUE } from '../theme';
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@gestioncommerciale.local');
+  // Champ vide : pre-remplir une adresse revenait a designer un compte a tout
+  // visiteur de la page de connexion.
+  const [email, setEmail] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [erreur, setErreur] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -64,9 +66,14 @@ export default function LoginPage() {
           </Typography>
 
           <form onSubmit={handleSubmit}>
+            {/* autoComplete laisse le gestionnaire de mots de passe du
+                navigateur proposer les identifiants enregistres, ce qu'un champ
+                pre-rempli en dur empechait. */}
             <TextField
               label="Email"
               type="email"
+              autoComplete="username"
+              autoFocus
               fullWidth
               margin="normal"
               value={email}
@@ -76,6 +83,7 @@ export default function LoginPage() {
             <TextField
               label="Mot de passe"
               type="password"
+              autoComplete="current-password"
               fullWidth
               margin="normal"
               value={motDePasse}
