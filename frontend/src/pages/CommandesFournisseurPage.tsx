@@ -343,7 +343,11 @@ export default function CommandesFournisseurPage() {
 
   return (
     <Box>
-      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 1.5, sm: 0 }}
+        sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 3 }}
+      >
         <Typography variant="h4">Commandes fournisseur</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={ouvrirCreation}>
           Nouvelle commande

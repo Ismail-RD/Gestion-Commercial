@@ -9,7 +9,7 @@
  *
  * <p>Deux précautions gouvernent ce fichier. D'abord, on ne remplace que des
  * <em>mots entiers</em> : sans cette frontière, « emise » à l'intérieur de
- * « Remises » donnerait « Rémises ». Ensuite, la fonction ne s'applique qu'aux
+ * « Remises » donnerait un mot inventé. Ensuite, la fonction ne s'applique qu'aux
  * champs de texte rédigé, jamais aux données : un client nommé « Societe Bel »
  * doit garder son nom tel qu'il a été saisi.
  */

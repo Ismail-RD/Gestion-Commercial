@@ -56,8 +56,20 @@ const theme = createTheme({
     fontFamily: [
       '"Segoe UI"', 'Inter', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif',
     ].join(','),
-    h4: { fontWeight: 700, letterSpacing: '-0.02em' },
-    h5: { fontWeight: 700, letterSpacing: '-0.01em' },
+    // Les titres se resserrent sur petit ecran : un h4 de bureau y mangerait
+    // deux lignes a lui seul.
+    h4: {
+      fontWeight: 700,
+      letterSpacing: '-0.02em',
+      fontSize: '2.125rem',
+      '@media (max-width:600px)': { fontSize: '1.5rem' },
+    },
+    h5: {
+      fontWeight: 700,
+      letterSpacing: '-0.01em',
+      fontSize: '1.5rem',
+      '@media (max-width:600px)': { fontSize: '1.25rem' },
+    },
     h6: { fontWeight: 600 },
     subtitle1: { fontWeight: 600 },
     subtitle2: { fontWeight: 600 },
@@ -167,7 +179,38 @@ const theme = createTheme({
     },
 
     MuiDialog: {
-      styleOverrides: { paper: { borderRadius: 16 } },
+      styleOverrides: {
+        paper: {
+          borderRadius: 16,
+          // Sur un telephone, un dialogue centre laisse des marges perdues et
+          // rend les formulaires longs illisibles. Il prend donc tout l'ecran,
+          // comme une page a part entiere.
+          '@media (max-width:600px)': {
+            margin: 0,
+            width: '100%',
+            maxWidth: '100%',
+            height: '100%',
+            maxHeight: '100%',
+            borderRadius: 0,
+          },
+        },
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        // Une cellule qui se coupe en trois lignes rend un tableau illisible :
+        // mieux vaut faire defiler horizontalement, ce que TableContainer
+        // permet deja. Les marges se resserrent sur petit ecran.
+        root: {
+          whiteSpace: 'nowrap',
+          '@media (max-width:600px)': { padding: '8px 10px' },
+        },
+      },
+    },
+
+    MuiTableContainer: {
+      styleOverrides: { root: { overflowX: 'auto' } },
     },
 
     MuiTextField: {

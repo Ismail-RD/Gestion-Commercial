@@ -76,7 +76,7 @@ const messageErreur = (e: unknown, defaut: string) =>
 /** Un effet n'a pas encore livre son argent tant qu'il n'est pas encaisse. */
 const STATUT_PAIEMENT: Record<string, { libelle: string; couleur: 'default' | 'info' | 'success' | 'error' }> = {
   RECU: { libelle: 'Reçu', couleur: 'default' },
-  DEPOSE: { libelle: 'Rémis en banque', couleur: 'info' },
+  DEPOSE: { libelle: 'Remis en banque', couleur: 'info' },
   ENCAISSE: { libelle: 'Encaissé', couleur: 'success' },
   REJETE: { libelle: 'Rejeté', couleur: 'error' },
 };
@@ -308,7 +308,11 @@ export default function FacturesPage() {
 
   return (
     <Box>
-      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 1.5, sm: 0 }}
+        sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
+      >
         <Typography variant="h4">Factures</Typography>
         {mesDroits.ecrireFacture && (
           <Button variant="contained" startIcon={<PaymentIcon />} onClick={() => setCreateOpen(true)}>
@@ -581,7 +585,7 @@ export default function FacturesPage() {
                                   etapes={[
                                     { libelle: 'Émis', date: p.dateEmission },
                                     { libelle: 'Reçu', date: p.dateReception },
-                                    { libelle: 'Rémis en banque', date: p.dateRemise },
+                                    { libelle: 'Remis en banque', date: p.dateRemise },
                                     { libelle: 'Encaissé', date: p.dateEncaissement },
                                     { libelle: 'Échéance', date: p.dateEcheance,
                                       prevu: !p.dateEncaissement },

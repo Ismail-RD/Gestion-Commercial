@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -15,6 +15,8 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import CategoryIcon from '@mui/icons-material/Category';
@@ -30,6 +32,7 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import InsightsIcon from '@mui/icons-material/Insights';
 import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../auth/AuthContext';
 import { droits, type Droits } from '../auth/droits';
 import ClocheNotifications from './ClocheNotifications';
@@ -73,6 +76,7 @@ const NAV: {
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const theme = useTheme();
   // On masque ce que le serveur refuserait, pour ne pas mener a une page vide.
   const mesDroits = droits(user?.role);
   const navVisible = NAV.filter((item) => !item.visible || item.visible(mesDroits));
@@ -88,52 +92,83 @@ export default function Layout({ children }: { children: ReactNode }) {
   // Le titre de la barre suit la navigation : on sait toujours où l'on est.
   const rubrique = navVisible.find((item) => estActif(item.to))?.label ?? '';
 
+  // Le menu occupe une largeur fixe qu'un telephone n'a pas : en dessous de
+  // 900 px il devient un tiroir qui s'ouvre a la demande.
+  const surGrandEcran = useMediaQuery(theme.breakpoints.up('md'));
+  const [tiroirOuvert, setTiroirOuvert] = useState(false);
+
+  // La navigation referme le tiroir : sur mobile il recouvre la page, et le
+  // laisser ouvert cacherait l'ecran qu'on vient de demander.
+  useEffect(() => {
+    setTiroirOuvert(false);
+  }, [location.pathname]);
+
+  const contenuDuMenu = (
+    <>
+      <Marque />
+      <Divider sx={{ mx: 2 }} />
+      <Box sx={{ overflowY: 'auto', py: 1 }}>
+        <List disablePadding>
+          {navVisible.map((item) => (
+            <ListItemButton
+              key={item.to}
+              component={RouterLink}
+              to={item.to}
+              selected={estActif(item.to)}
+            >
+              <ListItemIcon sx={{ minWidth: 38 }}>{item.icon}</ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                slotProps={{ primary: { variant: 'body2', sx: { fontWeight: 500 } } }}
+              />
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
+    </>
+  );
+
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Le menu occupe toute la hauteur et porte l'identité ; la barre du haut
-          lui laisse la place et n'accueille que ce qui concerne l'utilisateur. */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
-        }}
-      >
-        <Marque />
-        <Divider sx={{ mx: 2 }} />
-        <Box sx={{ overflowY: 'auto', py: 1 }}>
-          <List disablePadding>
-            {navVisible.map((item) => (
-              <ListItemButton
-                key={item.to}
-                component={RouterLink}
-                to={item.to}
-                selected={estActif(item.to)}
-              >
-                <ListItemIcon sx={{ minWidth: 38 }}>{item.icon}</ListItemIcon>
-                <ListItemText
-                  primary={item.label}
-                  slotProps={{ primary: { variant: 'body2', sx: { fontWeight: 500 } } }}
-                />
-              </ListItemButton>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
+      {/* Sur ordinateur le menu reste affiche en permanence ; ailleurs il
+          s'efface et revient a la demande, par-dessus la page. */}
+      <Box component="nav" sx={{ width: { md: DRAWER_WIDTH }, flexShrink: { md: 0 } }}>
+        <Drawer
+          variant={surGrandEcran ? 'permanent' : 'temporary'}
+          open={surGrandEcran || tiroirOuvert}
+          onClose={() => setTiroirOuvert(false)}
+          // Sur mobile, garder le tiroir monte accelere les ouvertures suivantes.
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
+          }}
+        >
+          {contenuDuMenu}
+        </Drawer>
+      </Box>
 
       <AppBar
         position="fixed"
-        sx={{ width: `calc(100% - ${DRAWER_WIDTH}px)`, ml: `${DRAWER_WIDTH}px` }}
+        sx={{
+          width: { xs: '100%', md: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { md: `${DRAWER_WIDTH}px` },
+        }}
       >
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Toolbar sx={{ gap: 1 }}>
+          {!surGrandEcran && (
+            <IconButton edge="start" color="inherit" onClick={() => setTiroirOuvert(true)}>
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             {rubrique}
           </Typography>
           {user && (
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+            <Stack direction="row" spacing={{ xs: 0.5, sm: 1.5 }} sx={{ alignItems: 'center' }}>
               <ClocheNotifications />
-              <Box sx={{ textAlign: 'right', lineHeight: 1.2 }}>
+              {/* Le nom et le role prennent trop de place sur un telephone :
+                  l'avatar suffit a dire qui est connecte. */}
+              <Box sx={{ textAlign: 'right', lineHeight: 1.2, display: { xs: 'none', sm: 'block' } }}>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                   {user.prenom} {user.nom}
                 </Typography>
@@ -141,9 +176,11 @@ export default function Layout({ children }: { children: ReactNode }) {
                   {ROLES_LISIBLES[user.role] ?? user.role}
                 </Typography>
               </Box>
-              <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36, fontSize: '0.9rem' }}>
-                {(user.prenom?.[0] ?? '') + (user.nom?.[0] ?? '')}
-              </Avatar>
+              <Tooltip title={`${user.prenom} ${user.nom}`}>
+                <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36, fontSize: '0.9rem' }}>
+                  {(user.prenom?.[0] ?? '') + (user.nom?.[0] ?? '')}
+                </Avatar>
+              </Tooltip>
               <Tooltip title="Se déconnecter">
                 <IconButton onClick={logout} color="inherit">
                   <LogoutIcon />
@@ -154,7 +191,10 @@ export default function Layout({ children }: { children: ReactNode }) {
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: '100vh', width: 0 }}>
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, p: { xs: 1.5, sm: 2, md: 3 }, minHeight: '100vh', width: 0 }}
+      >
         <Toolbar />
         {children}
       </Box>

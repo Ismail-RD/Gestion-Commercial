@@ -118,7 +118,11 @@ export default function CategoriesPage() {
 
   return (
     <Box>
-      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={{ xs: 1.5, sm: 0 }}
+        sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
+      >
         <Typography variant="h4">Catégories</Typography>
         {mesDroits.ecrireCategorie && (
         <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
