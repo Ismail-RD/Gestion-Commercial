@@ -21,14 +21,16 @@ import java.time.Duration;
 public class ConfigurationBrevo {
 
     @Bean
-    RestClient clientBrevo(RestClient.Builder constructeur,
-                           @Value("${app.mail.brevo.url:https://api.brevo.com/v3/smtp/email}") String url) {
+    RestClient clientBrevo(@Value("${app.mail.brevo.url:https://api.brevo.com/v3/smtp/email}") String url) {
         // Sans ces limites, une panne du service distant ferait attendre
         // l'utilisateur jusqu'au delai du systeme.
         SimpleClientHttpRequestFactory fabrique = new SimpleClientHttpRequestFactory();
         fabrique.setConnectTimeout(Duration.ofSeconds(10));
         fabrique.setReadTimeout(Duration.ofSeconds(20));
 
-        return constructeur.baseUrl(url).requestFactory(fabrique).build();
+        // Client construit de zero : cette application n'expose pas de
+        // RestClient.Builder pre-configure, et en dependre empechait le
+        // demarrage.
+        return RestClient.builder().baseUrl(url).requestFactory(fabrique).build();
     }
 }
