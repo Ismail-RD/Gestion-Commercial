@@ -4,6 +4,8 @@ import com.example.gestioncommerciale.config.SocieteProperties;
 import com.example.gestioncommerciale.entity.Role;
 import com.example.gestioncommerciale.entity.Utilisateur;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,8 @@ import java.util.Map;
 /** Envoie a l'invite le lien qui lui permet de choisir son mot de passe. */
 @Service
 public class InvitationEmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(InvitationEmailService.class);
 
     private static final DateTimeFormatter DATE_FR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     /** Identifiant de l'image inline referencee par le template (cid:). */
@@ -85,6 +89,12 @@ public class InvitationEmailService {
             }
             mailSender.send(message);
         } catch (MailException | jakarta.mail.MessagingException e) {
+            // Le message rendu a l'ecran reste volontairement general : il
+            // s'adresse a un utilisateur, pas a un administrateur systeme. La
+            // cause exacte, elle, doit etre lisible dans les journaux du
+            // serveur, sans quoi une panne SMTP est indiagnosticable.
+            log.error("Envoi de l'invitation a {} impossible (expediteur {}) : {}",
+                    invite.getEmail(), expediteur, e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Envoi de l'invitation impossible : verifiez la configuration SMTP");
         }

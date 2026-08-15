@@ -8,6 +8,8 @@ import com.example.gestioncommerciale.entity.Devis;
 import com.example.gestioncommerciale.exception.ResourceNotFoundException;
 import com.example.gestioncommerciale.repository.DevisRepository;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +40,8 @@ import java.util.UUID;
  */
 @Service
 public class DevisEmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(DevisEmailService.class);
 
     private static final DateTimeFormatter DATE_FR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     /** Identifiant de l'image inline referencee par le template (cid:). */
@@ -126,6 +130,8 @@ public class DevisEmailService {
 
             mailSender.send(message);
         } catch (MailException | jakarta.mail.MessagingException e) {
+            log.error("Envoi du devis {} a {} impossible (expediteur {}) : {}",
+                    devis.getNumero(), destinataire, expediteur, e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Envoi de l'email impossible : verifiez la configuration SMTP");
         }
