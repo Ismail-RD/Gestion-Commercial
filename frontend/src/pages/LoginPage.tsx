@@ -30,7 +30,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, motDePasse);
-      navigate('/produits');
+      // Le tableau de bord est la porte d'entree de chaque role : il montre
+      // d'abord ce que la personne a a faire. Le catalogue ne dit rien de tel,
+      // et n'interesse pas le comptable.
+      navigate('/tableau-de-bord');
     } catch {
       setErreur('Email ou mot de passe incorrect');
     } finally {
