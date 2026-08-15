@@ -21,8 +21,9 @@ import {
   TablePagination,
   TableRow,
   TextField,
-  Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/BrandingWatermark';
+import EnTetePage from '../components/EnTetePage';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -87,7 +88,7 @@ export default function MarquesPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
       >
-        <Typography variant="h4">Marques</Typography>
+        <EnTetePage titre="Marques" icone={<IconeRubrique />} />
         {mesDroits.ecrireCatalogue && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditId(null); setForm(EMPTY_FORM); setDialogOpen(true); }}>
             Nouvelle marque

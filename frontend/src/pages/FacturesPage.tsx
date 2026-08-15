@@ -26,6 +26,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/Receipt';
+import EnTetePage from '../components/EnTetePage';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PaymentIcon from '@mui/icons-material/Payment';
 import EditIcon from '@mui/icons-material/Edit';
@@ -313,7 +315,7 @@ export default function FacturesPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
       >
-        <Typography variant="h4">Factures</Typography>
+        <EnTetePage titre="Factures" icone={<IconeRubrique />} />
         {mesDroits.ecrireFacture && (
           <Button variant="contained" startIcon={<PaymentIcon />} onClick={() => setCreateOpen(true)}>
             Nouvelle facture

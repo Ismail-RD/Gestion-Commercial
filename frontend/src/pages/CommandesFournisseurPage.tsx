@@ -29,6 +29,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/ShoppingBasket';
+import EnTetePage from '../components/EnTetePage';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
@@ -348,7 +350,7 @@ export default function CommandesFournisseurPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 3 }}
       >
-        <Typography variant="h4">Commandes fournisseur</Typography>
+        <EnTetePage titre="Commandes fournisseur" icone={<IconeRubrique />} />
         <Button variant="contained" startIcon={<AddIcon />} onClick={ouvrirCreation}>
           Nouvelle commande
         </Button>

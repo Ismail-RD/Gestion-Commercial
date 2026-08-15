@@ -24,6 +24,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/ShoppingCart';
+import EnTetePage from '../components/EnTetePage';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -403,7 +405,7 @@ export default function CommandesPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
       >
-        <Typography variant="h4">Commandes</Typography>
+        <EnTetePage titre="Commandes" icone={<IconeRubrique />} />
         {/* Vente au comptoir : une commande peut naitre sans devis */}
         {mesDroits.ecrireCommercial && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={ouvrirCreation}>

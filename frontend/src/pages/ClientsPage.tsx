@@ -26,6 +26,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/People';
+import EnTetePage from '../components/EnTetePage';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -158,7 +160,7 @@ export default function ClientsPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 2 }}
       >
-        <Typography variant="h4">Clients</Typography>
+        <EnTetePage titre="Clients" icone={<IconeRubrique />} />
         {mesDroits.ecrireCommercial && (<Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Nouveau client</Button>)}
       </Stack>
 

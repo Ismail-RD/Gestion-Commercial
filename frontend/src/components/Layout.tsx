@@ -18,6 +18,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import CategoryIcon from '@mui/icons-material/Category';
 import PeopleIcon from '@mui/icons-material/People';
@@ -37,6 +38,7 @@ import { useAuth } from '../auth/AuthContext';
 import { droits, type Droits } from '../auth/droits';
 import ClocheNotifications from './ClocheNotifications';
 import Marque from './Marque';
+import { BLEU_MARQUE } from '../theme';
 
 const DRAWER_WIDTH = 248;
 
@@ -90,7 +92,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     location.pathname === chemin || location.pathname.startsWith(`${chemin}/`);
 
   // Le titre de la barre suit la navigation : on sait toujours où l'on est.
-  const rubrique = navVisible.find((item) => estActif(item.to))?.label ?? '';
+  const entreeActive = navVisible.find((item) => estActif(item.to));
+  const rubrique = entreeActive?.label ?? '';
 
   // Le menu occupe une largeur fixe qu'un telephone n'a pas : en dessous de
   // 900 px il devient un tiroir qui s'ouvre a la demande.
@@ -159,6 +162,21 @@ export default function Layout({ children }: { children: ReactNode }) {
             <IconButton edge="start" color="inherit" onClick={() => setTiroirOuvert(true)}>
               <MenuIcon />
             </IconButton>
+          )}
+          {/* L'icône de la rubrique reprise dans une pastille : la barre du
+              haut et le menu se répondent, on se situe sans relire. */}
+          {entreeActive && (
+            <Box
+              sx={{
+                width: 34, height: 34, borderRadius: 2, flexShrink: 0,
+                display: { xs: 'none', sm: 'grid' }, placeItems: 'center',
+                color: 'primary.main',
+                bgcolor: alpha(BLEU_MARQUE, 0.14),
+                '& .MuiSvgIcon-root': { fontSize: 20 },
+              }}
+            >
+              {entreeActive.icon}
+            </Box>
           )}
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             {rubrique}

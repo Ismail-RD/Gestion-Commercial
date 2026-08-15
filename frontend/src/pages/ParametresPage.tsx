@@ -14,6 +14,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/Settings';
+import EnTetePage from '../components/EnTetePage';
 import SaveIcon from '@mui/icons-material/Save';
 import SectionDepots from '../components/SectionDepots';
 import { listerPouvoirs, modifierPouvoir, type PouvoirRole } from '../api/parametres';
@@ -86,7 +88,9 @@ export default function ParametresPage() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>Paramètres</Typography>
+      <Box sx={{ mb: 3 }}>
+        <EnTetePage titre="Paramètres" icone={<IconeRubrique />} />
+      </Box>
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6">Pouvoirs par rôle</Typography>

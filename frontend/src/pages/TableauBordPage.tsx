@@ -27,7 +27,7 @@ import { useAuth } from '../auth/AuthContext';
 import { monTableauBord, type Ton } from '../api/tableauBord';
 import SectionVisionStock from '../components/SectionVisionStock';
 import Graphe from '../components/Graphe';
-import { BLEU_MARQUE, VERT_MARQUE } from '../theme';
+import { BLEU_MARQUE, PALETTE_GRAPHES } from '../theme';
 
 /** Le ton porte la couleur, jamais le sens : le libelle dit deja ce qu il faut lire. */
 const COULEURS: Record<Ton, string> = {
@@ -37,12 +37,19 @@ const COULEURS: Record<Ton, string> = {
   alerte: 'error.main',
 };
 
-/** Couleur réelle du ton, pour un filet ou un fond : « neutre » vaut le bleu. */
+/**
+ * Couleur réelle du ton, pour un filet, un fond ou une icône : « neutre » vaut
+ * le bleu.
+ *
+ * <p>Ce sont les déclinaisons soutenues des couleurs du logo, et non les
+ * teintes d'origine : une icône bleu ciel posée sur un fond bleu très pâle se
+ * devine plus qu'elle ne se lit.
+ */
 function teinte(ton: Ton): string {
-  return ton === 'succes' ? VERT_MARQUE
+  return ton === 'succes' ? '#15A46B'
     : ton === 'attention' ? '#E08600'
     : ton === 'alerte' ? '#D92D20'
-    : BLEU_MARQUE;
+    : PALETTE_GRAPHES[0];
 }
 
 /**

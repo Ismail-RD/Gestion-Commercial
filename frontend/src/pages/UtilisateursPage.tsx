@@ -24,6 +24,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/ManageAccounts';
+import EnTetePage from '../components/EnTetePage';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
@@ -182,7 +184,7 @@ export default function UtilisateursPage() {
         spacing={{ xs: 1.5, sm: 0 }}
         sx={{ justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, mb: 3 }}
       >
-        <Typography variant="h4">Utilisateurs</Typography>
+        <EnTetePage titre="Utilisateurs" icone={<IconeRubrique />} />
         <Button variant="contained" startIcon={<PersonAddIcon />} onClick={ouvrirCreation}>
           Nouvel utilisateur
         </Button>

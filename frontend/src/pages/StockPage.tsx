@@ -27,6 +27,8 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import IconeRubrique from '@mui/icons-material/Warehouse';
+import EnTetePage from '../components/EnTetePage';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
@@ -186,7 +188,9 @@ export default function StockPage() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 2 }}>Stock</Typography>
+      <Box sx={{ mb: 2 }}>
+        <EnTetePage titre="Stock" icone={<IconeRubrique />} />
+      </Box>
 
       <Paper sx={{ mb: 2 }}>
         <Tabs value={tab} onChange={(_, v) => { setTab(v); setPage(0); }}>
