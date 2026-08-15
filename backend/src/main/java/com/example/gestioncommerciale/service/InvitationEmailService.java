@@ -3,15 +3,13 @@ package com.example.gestioncommerciale.service;
 import com.example.gestioncommerciale.config.SocieteProperties;
 import com.example.gestioncommerciale.entity.Role;
 import com.example.gestioncommerciale.entity.Utilisateur;
-import jakarta.mail.internet.MimeMessage;
+import com.example.gestioncommerciale.service.email.ExpediteurEmail;
+import com.example.gestioncommerciale.service.email.MessageEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.thymeleaf.context.Context;
@@ -28,8 +26,6 @@ public class InvitationEmailService {
     private static final Logger log = LoggerFactory.getLogger(InvitationEmailService.class);
 
     private static final DateTimeFormatter DATE_FR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    /** Identifiant de l'image inline referencee par le template (cid:). */
-    private static final String LOGO_CID = "logoSogetherm";
 
     /** Libelles lisibles : le nom technique du role n'a rien a faire dans un email. */
     private static final Map<Role, String> LIBELLES = Map.of(
@@ -41,18 +37,18 @@ public class InvitationEmailService {
             Role.COMPTABLE, "Comptable");
 
     private final SpringTemplateEngine templateEngine;
-    private final JavaMailSender mailSender;
+    private final ExpediteurEmail expedition;
     private final SocieteProperties societe;
     private final String expediteur;
     private final String frontendUrl;
 
     public InvitationEmailService(SpringTemplateEngine templateEngine,
-                                  JavaMailSender mailSender,
+                                  ExpediteurEmail expedition,
                                   SocieteProperties societe,
                                   @Value("${app.mail.expediteur}") String expediteur,
                                   @Value("${app.frontend.url}") String frontendUrl) {
         this.templateEngine = templateEngine;
-        this.mailSender = mailSender;
+        this.expedition = expedition;
         this.societe = societe;
         this.expediteur = expediteur;
         this.frontendUrl = frontendUrl;
@@ -61,8 +57,7 @@ public class InvitationEmailService {
     public void envoyer(Utilisateur invite) {
         Context ctx = new Context(Locale.FRANCE);
         ctx.setVariable("societe", societe);
-        ctx.setVariable("logoCid",
-                new ClassPathResource("pdf/logos/sogetherm.png").exists() ? LOGO_CID : "");
+        ctx.setVariable("logoSrc", expedition.sourceLogo());
         ctx.setVariable("nom", invite.getNom());
         ctx.setVariable("prenom", invite.getPrenom());
         ctx.setVariable("email", invite.getEmail());
@@ -75,28 +70,17 @@ public class InvitationEmailService {
         String html = templateEngine.process("email-invitation", ctx);
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(expediteur);
-            helper.setTo(invite.getEmail());
-            helper.setSubject("Votre acces a l'application " + societe.nom());
-            // setText doit preceder addInline.
-            helper.setText(html, true);
-
-            ClassPathResource logo = new ClassPathResource("pdf/logos/sogetherm.png");
-            if (logo.exists()) {
-                helper.addInline(LOGO_CID, logo, "image/png");
-            }
-            mailSender.send(message);
-        } catch (MailException | jakarta.mail.MessagingException e) {
+            expedition.envoyer(new MessageEmail(invite.getEmail(),
+                    "Votre acces a l'application " + societe.nom(), html));
+        } catch (MailException e) {
             // Le message rendu a l'ecran reste volontairement general : il
             // s'adresse a un utilisateur, pas a un administrateur systeme. La
             // cause exacte, elle, doit etre lisible dans les journaux du
-            // serveur, sans quoi une panne SMTP est indiagnosticable.
+            // serveur, sans quoi une panne d'envoi est indiagnosticable.
             log.error("Envoi de l'invitation a {} impossible (expediteur {}) : {}",
                     invite.getEmail(), expediteur, e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
-                    "Envoi de l'invitation impossible : verifiez la configuration SMTP");
+                    "Envoi de l'invitation impossible : verifiez la configuration des emails");
         }
     }
 

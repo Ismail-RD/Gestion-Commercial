@@ -28,10 +28,28 @@ app.jwt.secret=
 # app.bootstrap.admin-email=
 # app.bootstrap.admin-mot-de-passe=
 
-# --- SMTP ---
-# Laisser vide desactive l'envoi des devis et factures par email.
+# --- Envoi des emails ---
 # ATTENTION : une fois renseigne, l'application envoie de vrais messages aux
-# adresses reelles des clients.
+# adresses reelles des clients et des invites.
+#
+# Deux voies au choix, selon ce que l'hebergeur laisse sortir.
+#
+# 1) SMTP (defaut) : simple, mais beaucoup d'hebergeurs filtrent les ports
+#    sortants 25, 465, 587 et 2525 pour empecher l'envoi de courrier
+#    indesirable. Le symptome est une expiration de connexion, jamais un refus
+#    d'authentification. Identifiants sous Brevo > SMTP & API > onglet SMTP :
+#    le mot de passe est la cle SMTP (xsmtpsib-...), pas celui du compte.
+# app.mail.transport=smtp
 # spring.mail.username=
 # spring.mail.password=
+#
+# 2) API HTTPS, sur le port 443 : passe partout, y compris la ou le SMTP est
+#    bloque. Demande une cle d'API v3 (xkeysib-...), sous Brevo > SMTP & API >
+#    onglet API Keys. Une limite : cette voie n'accepte pas d'image integree,
+#    le logo des emails est donc servi par le frontend.
+# app.mail.transport=api
+# app.mail.brevo.cle=
+#
+# Dans les deux cas, l'adresse d'expedition doit etre validee chez Brevo
+# (Senders & IP), sinon l'envoi est refuse.
 # app.mail.expediteur=
